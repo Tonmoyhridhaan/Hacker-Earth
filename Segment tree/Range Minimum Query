@@ -1,0 +1,84 @@
+#pragma GCC optimize("Ofast")
+#pragma GCC target("avx,avx2,fma")
+#pragma GCC optimization ("unroll-loops")
+
+#include<bits/stdc++.h>
+using namespace std;
+#define pb push_back
+#define pii pair<int,int>
+#define pli pair<long long int,int>
+#define pbi pair<bool,int>
+#define pob pop_back
+#define all(a) a.begin(),a.end()
+#define fio ios_base::sync_with_stdio(false); cin.tie(0);cout.tie(0);
+#define i64 long long int
+#define mem(x,y) memset(x,y,sizeof(x))
+#define fill(arr,b) fill(arr, arr+sizeof(arr)/sizeof(arr[0]), b)
+#define maxarr(n,arr,m) m =-1e9;for(int i=0;i<n;i++)if(arr[i]>m) m=arr[i];
+#define read freopen("input.txt","r",stdin);
+
+const double pi = acos(-1.0);
+const int maxn = (i64)1e9+7;
+
+int arr[100000];
+int tree[400000];
+
+void init(int node, int b, int e){
+    if(b == e){
+         tree[node] = arr[b];
+         return;
+    }
+    int left = node<<1;
+    int right = (node<<1) + 1;
+    int m = (b+e)/2;
+    init(left,b,m);
+    init(right,m+1,e);
+    tree[node] = min(tree[left],tree[right]);
+}
+
+int query(int node, int b, int e, int i, int j){
+    if(e<i || b>j) return INT_MAX;
+    else if(e<=j && b>=i){
+        return tree[node];
+    }
+    int left = node<<1;
+    int right = (node<<1) + 1;
+    int m = (b+e)/2;
+    int v1 = query(left,b,m,i,j);
+    int v2 = query(right,m+1,e,i,j);
+    return min(v1,v2);
+}
+
+void update(int node, int b, int e, int i, int value){
+    if(i<b || i>e) return;
+    else if(b==i && e==i){
+        tree[node] = value;
+        return;
+    }
+    int left = node<<1;
+    int right = (node<<1) + 1;
+    int m = (b+e)/2;
+    update(left,b,m,i,value);
+    update(right,m+1,e,i,value);
+    tree[node] = min(tree[left],tree[right]);
+}
+
+int main()
+{
+    //read;
+    int n,k;
+    scanf("%d%d",&n,&k);
+    for(int i=1;i<=n;i++)scanf("%d",&arr[i]);
+    init(1,1,n);
+
+    while(k--)
+    {
+        getchar();
+        char c;
+        int x,y;
+        scanf("%c%d%d",&c,&x,&y);
+        if(c=='u') update(1,1,n,x,y);
+        else printf("%d\n",query(1,1,n,x,y));
+    }
+    return 0;
+}
